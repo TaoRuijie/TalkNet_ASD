@@ -447,6 +447,20 @@ def main():
 		pickle.dump(scores, fil)
 	sys.stderr.write(time.strftime("%Y-%m-%d %H:%M:%S") + " Scores extracted and saved in %s \r\n" %args.pyworkPath)
 
+	# Filter speaking tracks based on ASD scores
+	speaking_threshold = 0.5  # Adjust this value based on your model's output range
+	speaking_tracks = []
+	for idx, score in enumerate(scores):
+		if score > speaking_threshold:  # Keep tracks where the score exceeds the threshold
+			speaking_tracks.append(files[idx])
+
+	# Remove non-speaking tracks from 'pycrop'
+	for file in files:
+		if file not in speaking_tracks:
+			os.remove(file)
+
+	sys.stderr.write(time.strftime("%Y-%m-%d %H:%M:%S") + " Saved only speaking face tracks in %s \r\n" % args.pycropPath)
+
 	if args.evalCol == True:
 		evaluate_col_ASD(vidTracks, scores, args) # The columnbia video is too big for visualization. You can still add the `visualization` funcition here if you want
 		quit()
