@@ -450,9 +450,16 @@ def main():
 	# Filter speaking tracks based on ASD scores
 	speaking_threshold = 0.5  # Adjust this value based on your model's output range
 	speaking_tracks = []
+
 	for idx, score in enumerate(scores):
-		if score > speaking_threshold:  # Keep tracks where the score exceeds the threshold
-			speaking_tracks.append(files[idx])
+		# Assuming `score` is an array of confidence values for a track
+		if isinstance(score, (list, numpy.ndarray)):
+			if numpy.min(score) > speaking_threshold:  # Use max score for filtering
+				speaking_tracks.append(files[idx])
+		else:
+			# Handle cases where `score` is a scalar (fallback)
+			if score > speaking_threshold:
+				speaking_tracks.append(files[idx])
 
 	# Remove non-speaking tracks from 'pycrop'
 	for file in files:
