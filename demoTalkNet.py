@@ -450,7 +450,7 @@ def main():
 	sys.stderr.write(time.strftime("%Y-%m-%d %H:%M:%S") + " Scores extracted and saved in %s \r\n" %args.pyworkPath)
 
 	# Filter speaking tracks based on ASD scores
-	speaking_threshold = 0.5  # Adjust this value based on your model's output range
+	speaking_threshold = 0  # Adjust this value based on your model's output range
 	speaking_tracks = []
 	speaking_tracks_audio = []
 
