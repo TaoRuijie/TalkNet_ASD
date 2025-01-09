@@ -25,7 +25,7 @@ parser.add_argument('--pretrainModel',         type=str, default="pretrain_TalkS
 
 parser.add_argument('--nDataLoaderThread',     type=int,   default=10,   help='Number of workers')
 parser.add_argument('--facedetScale',          type=float, default=0.25, help='Scale factor for face detection, the frames will be scale to 0.25 orig')
-parser.add_argument('--minTrack',              type=int,   default=10,   help='Number of min frames for each shot')
+parser.add_argument('--minTrack',              type=int,   default=60,   help='Number of min frames for each shot')
 parser.add_argument('--numFailedDet',          type=int,   default=10,   help='Number of missed detections allowed before tracking is stopped')
 parser.add_argument('--minFaceSize',           type=int,   default=1,    help='Minimum face size in pixels')
 parser.add_argument('--cropScale',             type=float, default=0.40, help='Scale bounding box')
@@ -164,7 +164,7 @@ def crop_video(args, track, cropFile):
 	# CPU: crop the face clips
 	flist = glob.glob(os.path.join(args.pyframesPath, '*.jpg')) # Read the frames
 	flist.sort()
-	vOut = cv2.VideoWriter(cropFile + 't.avi', cv2.VideoWriter_fourcc(*'XVID'), 25, (224,224))# Write video
+	vOut = cv2.VideoWriter(cropFile + 't.avi', cv2.VideoWriter_fourcc(*'XVID'), 25, (256,256))# Write video
 	dets = {'x':[], 'y':[], 's':[]}
 	for det in track['bbox']: # Read the tracks
 		dets['s'].append(max((det[3]-det[1]), (det[2]-det[0]))/2) 
@@ -182,7 +182,7 @@ def crop_video(args, track, cropFile):
 		my  = dets['y'][fidx] + bsi  # BBox center Y
 		mx  = dets['x'][fidx] + bsi  # BBox center X
 		face = frame[int(my-bs):int(my+bs*(1+2*cs)),int(mx-bs*(1+cs)):int(mx+bs*(1+cs))]
-		vOut.write(cv2.resize(face, (224, 224)))
+		vOut.write(cv2.resize(face, (256, 256)))
 	audioTmp    = cropFile + '.wav'
 	audioStart  = (track['frame'][0]) / 25
 	audioEnd    = (track['frame'][-1]+1) / 25
@@ -223,7 +223,7 @@ def evaluate_network(files, args):
 			ret, frames = video.read()
 			if ret == True:
 				face = cv2.cvtColor(frames, cv2.COLOR_BGR2GRAY)
-				face = cv2.resize(face, (224,224))
+				face = cv2.resize(face, (256,256))
 				face = face[int(112-(112/2)):int(112+(112/2)), int(112-(112/2)):int(112+(112/2))]
 				videoFeature.append(face)
 			else:
@@ -270,6 +270,7 @@ def visualization(tracks, scores, args):
 	colorDict = {0: 0, 1: 255}
 	for fidx, fname in tqdm.tqdm(enumerate(flist), total = len(flist)):
 		image = cv2.imread(fname)
+		# image = cv2.resize(image, )
 		for face in faces[fidx]:
 			clr = colorDict[int((face['score'] >= 0))]
 			txt = round(face['score'], 1)
