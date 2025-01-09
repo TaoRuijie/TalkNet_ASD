@@ -457,32 +457,32 @@ def main():
 		pickle.dump(scores, fil)
 	sys.stderr.write(time.strftime("%Y-%m-%d %H:%M:%S") + " Scores extracted and saved in %s \r\n" %args.pyworkPath)
 
-	# Filter speaking tracks based on ASD scores
-	speaking_threshold = 0  # Adjust this value based on your model's output range
-	speaking_tracks = []
-	speaking_tracks_audio = []
+	# # Filter speaking tracks based on ASD scores
+	# speaking_threshold = 0  # Adjust this value based on your model's output range
+	# speaking_tracks = []
+	# speaking_tracks_audio = []
 
-	for idx, score in enumerate(scores):
-		# Assuming `score` is an array of confidence values for a track
-		if isinstance(score, (list, numpy.ndarray)):
-			if numpy.min(score) > speaking_threshold:  # Use max score for filtering
-				speaking_tracks.append(files[idx])
-				speaking_tracks_audio.append(files_audio[idx])
-		else:
-			# Handle cases where `score` is a scalar (fallback)
-			if score > speaking_threshold:
-				speaking_tracks.append(files[idx])
-				speaking_tracks_audio.append(files_audio[idx])
+	# for idx, score in enumerate(scores):
+	# 	# Assuming `score` is an array of confidence values for a track
+	# 	if isinstance(score, (list, numpy.ndarray)):
+	# 		if numpy.min(score) > speaking_threshold:  # Use max score for filtering
+	# 			speaking_tracks.append(files[idx])
+	# 			speaking_tracks_audio.append(files_audio[idx])
+	# 	else:
+	# 		# Handle cases where `score` is a scalar (fallback)
+	# 		if score > speaking_threshold:
+	# 			speaking_tracks.append(files[idx])
+	# 			speaking_tracks_audio.append(files_audio[idx])
 
-	# Remove non-speaking tracks from 'pycrop'
-	for file in files:
-		if file not in speaking_tracks:
-			os.remove(file)
-	for file in files_audio:
-		if file not in speaking_tracks_audio:
-			os.remove(file)
+	# # Remove non-speaking tracks from 'pycrop'
+	# for file in files:
+	# 	if file not in speaking_tracks:
+	# 		os.remove(file)
+	# for file in files_audio:
+	# 	if file not in speaking_tracks_audio:
+	# 		os.remove(file)
 
-	sys.stderr.write(time.strftime("%Y-%m-%d %H:%M:%S") + " Saved only speaking face tracks in %s \r\n" % args.pycropPath)
+	# sys.stderr.write(time.strftime("%Y-%m-%d %H:%M:%S") + " Saved only speaking face tracks in %s \r\n" % args.pycropPath)
 
 	# Frame rate of the video (assumed 25 FPS)
 	FPS = 25
