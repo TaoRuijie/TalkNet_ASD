@@ -25,7 +25,7 @@ parser.add_argument('--pretrainModel',         type=str, default="pretrain_TalkS
 
 parser.add_argument('--nDataLoaderThread',     type=int,   default=10,   help='Number of workers')
 parser.add_argument('--facedetScale',          type=float, default=0.25, help='Scale factor for face detection, the frames will be scale to 0.25 orig')
-parser.add_argument('--minTrack',              type=int,   default=60,   help='Number of min frames for each shot')
+parser.add_argument('--minTrack',              type=int,   default=40,   help='Number of min frames for each shot')
 parser.add_argument('--numFailedDet',          type=int,   default=10,   help='Number of missed detections allowed before tracking is stopped')
 parser.add_argument('--minFaceSize',           type=int,   default=1,    help='Minimum face size in pixels')
 parser.add_argument('--cropScale',             type=float, default=0.40, help='Scale bounding box')
@@ -350,6 +350,13 @@ def evaluate_col_ASD(tracks, scores, args):
 			print("%s, ACC:%.2f, F1:%.2f"%(i, 100 * ACC, 100 * F1))
 	print("Average F1:%.2f"%(100 * (F1s / 5)))	  
 
+def extract_segment(track_path, start_frame, end_frame, output_path, fps):
+    start_time = start_frame / fps
+    end_time = end_frame / fps
+    command = f"ffmpeg -y -i {track_path}.avi -ss {start_time} -to {end_time} -c copy {output_path} -loglevel panic"
+    subprocess.call(command, shell=True, stdout=None)
+
+
 # Main function
 def main():
 	# This preprocesstion is modified based on this [repository](https://github.com/joonson/syncnet_python).
@@ -476,6 +483,56 @@ def main():
 			os.remove(file)
 
 	sys.stderr.write(time.strftime("%Y-%m-%d %H:%M:%S") + " Saved only speaking face tracks in %s \r\n" % args.pycropPath)
+
+	# Frame rate of the video (assumed 25 FPS)
+	FPS = 25
+	MIN_SEGMENT_FRAMES = 2 * FPS  # Minimum segment length in frames
+	MAX_SEGMENT_FRAMES = 5 * FPS  # Maximum segment length in frames
+
+	filtered_segments = []
+
+	# Process each track and its corresponding score
+	for ii, (track, score_array) in tqdm.tqdm(enumerate(zip(allTracks, scores)), total=len(allTracks)):
+		start_frame = None
+		end_frame = None
+		segment_frames = []
+
+		for frame_idx, score in enumerate(score_array):
+			if score > 0:
+				# Start a new segment if not already started
+				if start_frame is None:
+					start_frame = frame_idx
+				end_frame = frame_idx
+
+				# Check if segment length exceeds the maximum allowed duration
+				if (end_frame - start_frame + 1) > MAX_SEGMENT_FRAMES:
+					# Save the current valid segment
+					segment_frames.append((start_frame, end_frame))
+					start_frame = None  # Reset for next segment
+			else:
+				# End the current segment if the score is not positive
+				if start_frame is not None:
+					# Save only if segment is long enough
+					if (end_frame - start_frame + 1) >= MIN_SEGMENT_FRAMES:
+						segment_frames.append((start_frame, end_frame))
+					start_frame = None
+
+		# Handle last segment if it ends positively
+		if start_frame is not None and (end_frame - start_frame + 1) >= MIN_SEGMENT_FRAMES:
+			segment_frames.append((start_frame, end_frame))
+
+		# Extract and save each valid segment
+		for seg_idx, (seg_start, seg_end) in enumerate(segment_frames):
+			segment_path = os.path.join(args.pycropPath, f"{ii:05d}_segment_{seg_idx:02d}.avi")
+			extract_segment(track, seg_start, seg_end, segment_path, FPS)
+			filtered_segments.append(segment_path)
+
+	# Save filtered segments metadata
+	savePath = os.path.join(args.pyworkPath, 'filtered_segments.pckl')
+	with open(savePath, 'wb') as fil:
+		pickle.dump(filtered_segments, fil)
+	sys.stderr.write(f"{time.strftime('%Y-%m-%d %H:%M:%S')} Filtered segments saved in {savePath}\n")
+
 
 	if args.evalCol == True:
 		evaluate_col_ASD(vidTracks, scores, args) # The columnbia video is too big for visualization. You can still add the `visualization` funcition here if you want
