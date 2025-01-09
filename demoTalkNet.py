@@ -389,12 +389,14 @@ def main():
 	args.pyframesPath = os.path.join(args.savePath, 'pyframes')
 	args.pyworkPath = os.path.join(args.savePath, 'pywork')
 	args.pycropPath = os.path.join(args.savePath, 'pycrop')
+	args.pyfilteredSegments = os.path.join(args.savePath, 'pyfilter')
 	if os.path.exists(args.savePath):
 		rmtree(args.savePath)
 	os.makedirs(args.pyaviPath, exist_ok = True) # The path for the input video, input audio, output video
 	os.makedirs(args.pyframesPath, exist_ok = True) # Save all the video frames
 	os.makedirs(args.pyworkPath, exist_ok = True) # Save the results in this process by the pckl method
 	os.makedirs(args.pycropPath, exist_ok = True) # Save the detected face clips (audio+video) in this process
+	os.makedirs(args.pyfilteredSegments, exist_ok = True) # Save the detected face clips (audio+video) in this process
 
 	# Extract video
 	args.videoFilePath = os.path.join(args.pyaviPath, 'video.avi')
