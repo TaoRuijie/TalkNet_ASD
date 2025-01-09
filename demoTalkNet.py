@@ -521,6 +521,7 @@ def main():
 		if start_frame is not None and (end_frame - start_frame + 1) >= MIN_SEGMENT_FRAMES:
 			segment_frames.append((start_frame, end_frame))
 
+		print("Found Segments:  ", len(segment_frames))
 		# Extract and save each valid segment
 		for seg_idx, (seg_start, seg_end) in enumerate(segment_frames):
 			segment_path = os.path.join(args.pycropPath, f"{ii:05d}_segment_{seg_idx:02d}.avi")
