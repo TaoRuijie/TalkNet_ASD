@@ -526,7 +526,7 @@ def main():
 		count_segments += len(segment_frames)
 		# Extract and save each valid segment
 		for seg_idx, (seg_start, seg_end) in enumerate(segment_frames):
-			segment_path = os.path.join(args.pycropPath, f"{ii:05d}_segment_{seg_idx:02d}.avi")
+			segment_path = os.path.join(args.pyfilteredSegments, f"{ii:05d}_segment_{seg_idx:02d}.avi")
 			track_path = os.path.join(args.pycropPath, '%05d'%ii)
 			extract_segment(track_path, seg_start, seg_end, segment_path, FPS)
 			filtered_segments.append(segment_path)
