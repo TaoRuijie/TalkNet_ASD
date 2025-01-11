@@ -1,5 +1,7 @@
 import sys, time, os, tqdm, torch, argparse, glob, subprocess, warnings, cv2, pickle, numpy, pdb, math, python_speech_features
 
+import cProfile
+import pstats
 from scipy import signal
 from shutil import rmtree
 from scipy.io import wavfile
@@ -547,4 +549,16 @@ def main():
 		visualization(vidTracks, scores, args)	
 
 if __name__ == '__main__':
-    main()
+    profiler = cProfile.Profile()
+    profiler.enable()
+    main()  # Run your script here
+    profiler.disable()
+
+    # Save the profiling data to a file
+    profiler.dump_stats("profiling_results.prof")
+
+    # Optional: Print profiling stats to the console
+    stats = pstats.Stats(profiler)
+    stats.strip_dirs()
+    stats.sort_stats("cumulative")  # Sort by cumulative time
+    stats.print_stats(20)  # Print the top 20 time-consuming functions
