@@ -356,7 +356,7 @@ import subprocess
 def extract_segment(track_path, start_frame, end_frame, output_path, fps):
     start_time = start_frame / fps
     end_time = end_frame / fps
-    command = f'ffmpeg -i "{track_path}.avi" -accurate_seek -ss {start_time} -to {end_time} -c:v libx264 -c:a aac "{output_path}" -loglevel panic'
+    command = f'ffmpeg -accurate_seek -i "{track_path}.avi" -ss {start_time} -to {end_time} -c:v libx264 -c:a aac "{output_path}" -loglevel panic'
     # Execute command and capture errors
     try:
         result = subprocess.run(command, shell=True, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
