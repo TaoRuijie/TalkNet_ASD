@@ -495,7 +495,7 @@ def main():
 	# sys.stderr.write(time.strftime("%Y-%m-%d %H:%M:%S") + " Saved only speaking face tracks in %s \r\n" % args.pycropPath)
 
 	# Frame rate of the video (assumed 25 FPS)
-	FPS = 25
+	FPS = 29.97
 	MIN_SEGMENT_FRAMES = 2 * FPS  # Minimum segment length in frames
 	MAX_SEGMENT_FRAMES = 5 * FPS  # Maximum segment length in frames
 
