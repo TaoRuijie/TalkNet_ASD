@@ -355,7 +355,7 @@ def evaluate_col_ASD(tracks, scores, args):
 def extract_segment(track_path, start_frame, end_frame, output_path, fps):
     start_time = start_frame / fps
     end_time = end_frame / fps
-    command = f'ffmpeg -y -i "{track_path}.avi" -ss {start_time} -to {end_time} -c copy "{output_path}" -loglevel panic'
+    command = f'ffmpeg -y -i "{track_path}.avi" -accurate_seek -ss {start_time} -to {end_time} "{output_path}" -loglevel panic'
     subprocess.call(command, shell=True, stdout=None)
 
 
