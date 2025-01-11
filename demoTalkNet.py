@@ -352,11 +352,17 @@ def evaluate_col_ASD(tracks, scores, args):
 			print("%s, ACC:%.2f, F1:%.2f"%(i, 100 * ACC, 100 * F1))
 	print("Average F1:%.2f"%(100 * (F1s / 5)))	  
 
+import subprocess
 def extract_segment(track_path, start_frame, end_frame, output_path, fps):
     start_time = start_frame / fps
     end_time = end_frame / fps
-    command = f'ffmpeg -y -i "{track_path}.avi" -accurate_seek -ss {start_time} -to {end_time} "{output_path}" -loglevel panic'
-    subprocess.call(command, shell=True, stdout=None)
+    command = f'ffmpeg -i "{track_path}.avi" -accurate_seek -ss {start_time} -to {end_time} "{output_path}" -loglevel panic'
+    # Execute command and capture errors
+    try:
+        result = subprocess.run(command, shell=True, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        print(f"Segment extracted successfully: {output_path}")
+    except subprocess.CalledProcessError as e:
+        print(f"Error extracting segment: {e.stderr.decode().strip()}")
 
 
 # Main function
