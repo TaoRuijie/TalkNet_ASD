@@ -362,7 +362,7 @@ def extract_segment(track_path, start_frame, end_frame, output_path, fps):
         result = subprocess.run(command, shell=True, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         print(f"Segment extracted successfully: {output_path}")
     except subprocess.CalledProcessError as e:
-        print(f"Error extracting segment: {e.stderr.decode().strip()}")
+        print(f"Error extracting segment: {e}")
 
 
 # Main function
