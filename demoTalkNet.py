@@ -655,7 +655,7 @@ def main():
                         y = angles[1] * 360				
                               
 
-                if abs(y) < 30:
+                if abs(y) < 10:
                     # Start a new segment if not already started
                     if start_frame is None:
                         start_frame = frame_idx
