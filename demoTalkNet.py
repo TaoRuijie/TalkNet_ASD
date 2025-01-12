@@ -604,11 +604,6 @@ def main():
                 frame_number = track['frame'][frame_idx]
                 frame_path = os.path.join(args.pyframesPath, f"{frame_number:06d}.jpg")
                 image = cv2.imread(frame_path)
-                
-                # Display the frame using Matplotlib
-                plt.imshow(image)
-                plt.axis("off")  # Turn off axes for a cleaner display
-                plt.show()
 
                 # Check if the image was loaded successfully
                 if image is None:
