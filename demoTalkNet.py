@@ -27,6 +27,7 @@ from sklearn.metrics import accuracy_score, f1_score
 
 from scenedetect.video_manager import VideoManager
 from scenedetect.scene_manager import SceneManager
+from scenedetect import SceneManager, open_video, ContentDetector, ThresholdDetector
 from scenedetect.frame_timecode import FrameTimecode
 from scenedetect.stats_manager import StatsManager
 from scenedetect.detectors import ContentDetector
@@ -120,23 +121,22 @@ else:
 
 def scene_detect(args):
     # CPU: Scene detection, output is the list of each shot's time duration
-    videoManager = VideoManager([args.videoFilePath])
-    statsManager = StatsManager()
-    sceneManager = SceneManager(statsManager)
-    sceneManager.add_detector(ContentDetector())
-    baseTimecode = videoManager.get_base_timecode()
-    videoManager.set_downscale_factor()
-    videoManager.start()
-    sceneManager.detect_scenes(frame_source=videoManager)
-    sceneList = sceneManager.get_scene_list(baseTimecode)
+    video = open_video(args.videoFilePath)
+
+    sceneManager = SceneManager()
+    sceneManager.add_detector(ContentDetector(threshold=27.0, min_scene_len=30), ThresholdDetector(threshold=12.0))
+
+    sceneManager.detect_scenes(video)
+    sceneList = sceneManager.get_scene_list()
+
     savePath = os.path.join(args.pyworkPath, 'scene.pckl')
-    if sceneList == []:
-        sceneList = [(videoManager.get_base_timecode(),
-                      videoManager.get_current_timecode())]
-    with open(savePath, 'wb') as fil:
-        pickle.dump(sceneList, fil)
-        sys.stderr.write('%s - scenes detected %d\n' %
-                         (args.videoFilePath, len(sceneList)))
+    if not sceneList:
+        # Fallback: If no scenes detected, create a single "scene" from start to end
+        sceneList = [(0, video.frame_count)]
+    with open(savePath, 'wb') as file:
+        pickle.dump(sceneList, file)
+        sys.stderr.write(f"{args.videoFilePath} - scenes detected: {len(sceneList)}\n")
+    
     return sceneList
 
 
@@ -655,7 +655,7 @@ def main():
                         y = angles[1] * 360				
                               
 
-                if abs(y) < 10:
+                if abs(y) < 30:
                     # Start a new segment if not already started
                     if start_frame is None:
                         start_frame = frame_idx
