@@ -15,6 +15,7 @@ import pdb
 import math
 import python_speech_features
 import mediapipe as mp
+import matplotlib.pyplot as plt
 
 import cProfile
 import pstats
@@ -603,10 +604,20 @@ def main():
                 frame_number = track['frame'][frame_idx]
                 frame_path = os.path.join(args.pyframesPath, f"{frame_number:06d}.jpg")
                 image = cv2.imread(frame_path)
+                
+                # Display the frame using Matplotlib
+                plt.imshow(image)
+                plt.axis("off")  # Turn off axes for a cleaner display
+                plt.show()
 
-                results = face_mesh.process(image)
+                # Check if the image was loaded successfully
+                if image is None:
+                    print(f"Warning: Frame {frame_number} could not be loaded! Skipping...")
+                    continue
 
-                img_h, img_w, img_c = image.shape
+                results = face_mesh.process(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
+
+                img_h, img_w, _ = image.shape
                 face_2d = []
                 face_3d = []
                 y=0
@@ -635,7 +646,7 @@ def main():
                         distortion_matrix = numpy.zeros((4,1),dtype=numpy.float64)
 
                         # SolvePnP to calculate rotation and translation vectors
-                        success,rotation_vec,translation_vec = cv2.solvePnP(face_3d,face_2d,cam_matrix,distortion_matrix)
+                        _,rotation_vec,_ = cv2.solvePnP(face_3d,face_2d,cam_matrix,distortion_matrix)
 
                         #getting rotational of face
                         rmat,_ = cv2.Rodrigues(rotation_vec)
