@@ -602,7 +602,7 @@ def main():
 
             if score > 0:
                 frame_number = track['frame'][frame_idx]
-                frame_path = os.path.join(args.pyframesPath, f"{frame_number:06d}.jpg")
+                frame_path = os.path.join(args.pyframesPath, f"{(frame_number+1):06d}.jpg")
                 image = cv2.imread(frame_path)
 
                 # Check if the image was loaded successfully
