@@ -124,7 +124,9 @@ def scene_detect(args):
     video = open_video(args.videoFilePath)
 
     sceneManager = SceneManager()
-    sceneManager.add_detector(ContentDetector(threshold=27.0, min_scene_len=30), ThresholdDetector(threshold=12.0))
+
+    sceneManager.add_detector(ContentDetector(threshold=27.0, min_scene_len=30))
+    sceneManager.add_detector(ThresholdDetector(threshold=12.0))
 
     sceneManager.detect_scenes(video)
     sceneList = sceneManager.get_scene_list()
