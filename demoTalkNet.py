@@ -55,13 +55,24 @@ parser.add_argument('--fps',                   type=float,
 parser.add_argument('--frame_size',                   type=int,
                     default=256,   help='Desired frame size')
 
+parser.add_argument('--angleThreshold',                   type=int,
+                    default=10,   help='Desired threshold for yaw')
+parser.add_argument('--contentDetectorThreshold',                   type=float,
+                    default=27.0,   help='Desired frame size')
+parser.add_argument('--thresholdDetectorThreshold',                   type=float,
+                    default=30.0,   help='Desired frame size')
+# parser.add_argument('--frame_size',                   type=int,
+                    # default=256,   help='Desired frame size')
+# parser.add_argument('--frame_size',                   type=int,
+                    # default=256,   help='Desired frame size')
+
 parser.add_argument('--nDataLoaderThread',     type=int,
                     default=10,   help='Number of workers')
 parser.add_argument('--facedetScale',          type=float, default=0.25,
                     help='Scale factor for face detection, the frames will be scale to 0.25 orig')
 parser.add_argument('--minTrack',              type=int,
                     default=40,   help='Number of min frames for each shot')
-parser.add_argument('--numFailedDet',          type=int,   default=10,
+parser.add_argument('--numFailedDet',          type=int,   default=5,
                     help='Number of missed detections allowed before tracking is stopped')
 parser.add_argument('--minFaceSize',           type=int,
                     default=1,    help='Minimum face size in pixels')
@@ -125,8 +136,8 @@ def scene_detect(args):
 
     sceneManager = SceneManager()
 
-    sceneManager.add_detector(ContentDetector(threshold=27.0, min_scene_len=30))
-    sceneManager.add_detector(ThresholdDetector(threshold=30.0))
+    sceneManager.add_detector(ContentDetector(threshold=args.contentDetectorThreshold, min_scene_len=30))
+    sceneManager.add_detector(ThresholdDetector(threshold=args.thresholdDetectorThreshold))
 
     sceneManager.detect_scenes(video)
     sceneList = sceneManager.get_scene_list()
@@ -657,7 +668,7 @@ def main():
                         y = angles[1] * 360				
                               
 
-                if abs(y) < 30:
+                if abs(y) < args.angleThreshold:
                     # Start a new segment if not already started
                     if start_frame is None:
                         start_frame = frame_idx
