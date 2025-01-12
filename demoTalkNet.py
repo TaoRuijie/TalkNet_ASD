@@ -710,7 +710,7 @@ def main():
             segment_audio_path = os.path.join(
                 args.pyfilteredSegments, f"{ii:05d}_segment_{seg_idx:02d}.wav")
             track_path = os.path.join(args.pycropPath, '%05d' % ii)
-            extract_segment(track_path, seg_start, seg_end, segment_video_path, segment_audio_path)
+            extract_segment(track_path, seg_start+10, seg_end-10, segment_video_path, segment_audio_path)
             filtered_segments.append(segment_video_path)
 
     print("Found ", count_segments, " Segments")
