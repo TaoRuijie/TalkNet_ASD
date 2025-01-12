@@ -610,10 +610,10 @@ def main():
                     print(f"Warning: Frame {frame_number} could not be loaded! Skipping...")
                     continue
 
-                # Display the frame using Matplotlib
-                plt.imshow(image)
-                plt.axis("off")  # Turn off axes for a cleaner display
-                plt.show()
+                # # Display the frame using Matplotlib
+                # plt.imshow(image)
+                # plt.axis("off")  # Turn off axes for a cleaner display
+                # plt.show()
 
                 results = face_mesh.process(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
 
