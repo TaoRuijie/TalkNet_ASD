@@ -459,31 +459,68 @@ def evaluate_col_ASD(tracks, scores, args):
     print("Average F1:%.2f" % (100 * (F1s / 5)))
 
 
+# def extract_segment(track_path, start_frame, end_frame, output_path_video, output_path_audio):
+#     # Convert start_frame and end_frame to time (in seconds)
+#     start_time = start_frame / args.fps
+#     end_time = end_frame / args.fps
+
+#     # FFmpeg command to extract video with audio trimming
+#     command_video = f'ffmpeg -accurate_seek -i "{track_path}.avi" -ss {start_time} -to {end_time} -c:v libx264 -c:a aac "{output_path_video}" -loglevel panic'
+
+#     # FFmpeg command to extract audio separately
+#     command_audio = f'ffmpeg -accurate_seek -i "{track_path}.avi" -ss {start_time} -to {end_time} -vn -c:a aac "{output_path_audio}" -loglevel panic'
+
+#     # Execute command for video and audio extraction
+#     try:
+#         # Extract video
+#         subprocess.run(command_video, shell=True, check=True,
+#                        stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+#         # print(f"Video segment extracted successfully: {output_path_video}")
+
+#         # Extract audio
+#         subprocess.run(command_audio, shell=True, check=True,
+#                        stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+#         # print(f"Audio segment extracted successfully: {output_path_audio}")
+
+#     except subprocess.CalledProcessError as e:
+#         print(f"Error extracting segment: {e}")
+
+import subprocess
+
 def extract_segment(track_path, start_frame, end_frame, output_path_video, output_path_audio):
     # Convert start_frame and end_frame to time (in seconds)
     start_time = start_frame / args.fps
     end_time = end_frame / args.fps
 
     # FFmpeg command to extract video with audio trimming
-    command_video = f'ffmpeg -accurate_seek -i "{track_path}.avi" -ss {start_time} -to {end_time} -c:v libx264 -c:a aac "{output_path_video}"'
+    command_video = [
+        "ffmpeg",
+        "-accurate_seek",
+        "-i", f"{track_path}.avi",
+        "-ss", str(start_time),
+        "-to", str(end_time),
+        "-c:v", "libx264",
+        "-c:a", "aac",
+        output_path_video,
+    ]
 
-    # FFmpeg command to extract audio separately
-    command_audio = f'ffmpeg -accurate_seek -i "{track_path}.avi" -ss {start_time} -to {end_time} -vn -c:a aac "{output_path_audio}" -loglevel panic'
-
-    # Execute command for video and audio extraction
     try:
-        # Extract video
-        subprocess.run(command_video, shell=True, check=True,
-                       stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        # print(f"Video segment extracted successfully: {output_path_video}")
-
-        # Extract audio
-        subprocess.run(command_audio, shell=True, check=True,
-                       stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        # print(f"Audio segment extracted successfully: {output_path_audio}")
-
-    except subprocess.CalledProcessError as e:
-        print(f"Error extracting segment: {e}")
+        # Run the command and capture output
+        result = subprocess.run(
+            command_video, 
+            stdout=subprocess.PIPE, 
+            stderr=subprocess.PIPE, 
+            text=True
+        )
+        
+        if result.returncode != 0:
+            print("Error during FFmpeg execution:")
+            print(result.stderr)  # Print the error message from FFmpeg
+        else:
+            print("Segment extracted successfully.")
+    
+    except Exception as e:
+        print(f"Exception occurred while extracting segment: {e}")
 
 
 # Main function
