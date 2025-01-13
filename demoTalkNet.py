@@ -737,15 +737,15 @@ def main():
     #     # Visualization, save the result as the new video
     #     visualization(vidTracks, scores, args)
 
-# At the end of the main function
-folders_to_keep = [args.pyfilteredVideo, args.pyfilteredAudio]
-folders_to_delete = [args.pyaviPath, args.pyframesPath, args.pyworkPath, args.pycropPath]
+    # At the end of the main function
+    folders_to_keep = [args.pyfilteredVideo, args.pyfilteredAudio]
+    folders_to_delete = [args.pyaviPath, args.pyframesPath, args.pyworkPath, args.pycropPath]
 
-for folder in folders_to_delete:
-    if folder not in folders_to_keep and os.path.exists(folder):
-        rmtree(folder)
-sys.stderr.write(
-    f"{time.strftime('%Y-%m-%d %H:%M:%S')} Removed unnecessary folders after processing.\n")
+    for folder in folders_to_delete:
+        if folder not in folders_to_keep and os.path.exists(folder):
+            rmtree(folder)
+    sys.stderr.write(
+        f"{time.strftime('%Y-%m-%d %H:%M:%S')} Removed unnecessary folders after processing.\n")
 
 
 if __name__ == '__main__':
