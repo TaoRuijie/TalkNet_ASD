@@ -17,6 +17,7 @@ import python_speech_features
 import mediapipe as mp
 import matplotlib.pyplot as plt
 
+
 import cProfile
 import pstats
 from scipy import signal
@@ -36,6 +37,8 @@ from model.faceDetector.s3fd import S3FD
 from talkNet import talkNet
 
 warnings.filterwarnings("ignore")
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'  # Suppress TensorFlow logging
+
 mp_face_mesh = mp.solutions.face_mesh
 face_mesh = mp_face_mesh.FaceMesh(
     min_detection_confidence=0.5, min_tracking_confidence=0.5)
@@ -472,12 +475,12 @@ def extract_segment(track_path, start_frame, end_frame, output_path_video, outpu
         # Extract video
         subprocess.run(command_video, shell=True, check=True,
                        stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        print(f"Video segment extracted successfully: {output_path_video}")
+        # print(f"Video segment extracted successfully: {output_path_video}")
 
         # Extract audio
         subprocess.run(command_audio, shell=True, check=True,
                        stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        print(f"Audio segment extracted successfully: {output_path_audio}")
+        # print(f"Audio segment extracted successfully: {output_path_audio}")
 
     except subprocess.CalledProcessError as e:
         print(f"Error extracting segment: {e}")
@@ -749,16 +752,16 @@ def main():
 
 
 if __name__ == '__main__':
-    profiler = cProfile.Profile()
-    profiler.enable()
+    # profiler = cProfile.Profile()
+    # profiler.enable()
     main()  # Run your script here
-    profiler.disable()
+    # profiler.disable()
 
     # Save the profiling data to a file
-    profiler.dump_stats("profiling_results.prof")
+    # profiler.dump_stats("profiling_results.prof")
 
-    # Optional: Print profiling stats to the console
-    stats = pstats.Stats(profiler)
-    stats.strip_dirs()
-    stats.sort_stats("cumulative")  # Sort by cumulative time
-    stats.print_stats(20)  # Print the top 20 time-consuming functions
+    # # Optional: Print profiling stats to the console
+    # stats = pstats.Stats(profiler)
+    # stats.strip_dirs()
+    # stats.sort_stats("cumulative")  # Sort by cumulative time
+    # stats.print_stats(20)  # Print the top 20 time-consuming functions
