@@ -2,6 +2,7 @@ import subprocess
 import sys
 import time
 import os
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'  # Suppress TensorFlow logging
 import tqdm
 import torch
 import argparse
@@ -37,7 +38,6 @@ from model.faceDetector.s3fd import S3FD
 from talkNet import talkNet
 
 warnings.filterwarnings("ignore")
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'  # Suppress TensorFlow logging
 
 mp_face_mesh = mp.solutions.face_mesh
 face_mesh = mp_face_mesh.FaceMesh(
