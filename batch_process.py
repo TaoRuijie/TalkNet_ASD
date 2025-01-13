@@ -29,20 +29,6 @@ def main(args):
             "--videoName", video_name,
             "--videoFolderInput", args.videoFolderInput,
             "--videoFolderOutput", args.videoFolderOutput,
-            "--pretrainModel", args.pretrainModel,
-            "--fps", str(args.fps),
-            "--frame_size", str(args.frame_size),
-            "--angleThreshold", str(args.angleThreshold),
-            "--contentDetectorThreshold", str(args.contentDetectorThreshold),
-            "--thresholdDetectorThreshold", str(args.thresholdDetectorThreshold),
-            "--nDataLoaderThread", str(args.nDataLoaderThread),
-            "--facedetScale", str(args.facedetScale),
-            "--minTrack", str(args.minTrack),
-            "--numFailedDet", str(args.numFailedDet),
-            "--minFaceSize", str(args.minFaceSize),
-            "--cropScale", str(args.cropScale),
-            "--start", str(args.start),
-            "--duration", str(args.duration)
         ]
 
         # Print and execute the command
