@@ -465,7 +465,7 @@ def extract_segment(track_path, start_frame, end_frame, output_path_video, outpu
     end_time = end_frame / args.fps
 
     # FFmpeg command to extract video with audio trimming
-    command_video = f'ffmpeg -accurate_seek -i "{track_path}.avi" -ss {start_time} -to {end_time} -c:v libx264 -c:a aac "{output_path_video}" -loglevel panic'
+    command_video = f'ffmpeg -accurate_seek -i "{track_path}.avi" -ss {start_time} -to {end_time} -c:v libx264 -c:a aac "{output_path_video}"'
 
     # FFmpeg command to extract audio separately
     command_audio = f'ffmpeg -accurate_seek -i "{track_path}.avi" -ss {start_time} -to {end_time} -vn -c:a aac "{output_path_audio}" -loglevel panic'
@@ -541,11 +541,11 @@ def main():
     args.videoFilePath = os.path.join(args.pyaviPath, 'video.avi')
     # If duration did not set, extract the whole video, otherwise extract the video from 'args.start' to 'args.start + args.duration'
     if args.duration == 0:
-        command = ("ffmpeg -y -i %s -qscale:v 2 -threads %d -async 1 -r 25 %s -loglevel panic" %
-                   (args.videoPath, args.nDataLoaderThread, args.videoFilePath))
+        command = ("ffmpeg -y -i %s -qscale:v 2 -threads %d -async 1 -r %.3f %s -loglevel panic" %
+                   (args.videoPath, args.nDataLoaderThread, args.fps,  args.videoFilePath))
     else:
-        command = ("ffmpeg -y -i %s -qscale:v 2 -threads %d -ss %.3f -to %.3f -async 1 -r 25 %s -loglevel panic" %
-                   (args.videoPath, args.nDataLoaderThread, args.start, args.start + args.duration, args.videoFilePath))
+        command = ("ffmpeg -y -i %s -qscale:v 2 -threads %d -ss %.3f -to %.3f -async 1 -r %.3f %s -loglevel panic" %
+                   (args.videoPath, args.nDataLoaderThread, args.start, args.start + args.duration, args.fps, args.videoFilePath))
     subprocess.call(command, shell=True, stdout=None)
     sys.stderr.write(time.strftime("%Y-%m-%d %H:%M:%S") +
                      " Extract the video and save in %s \r\n" % (args.videoFilePath))
