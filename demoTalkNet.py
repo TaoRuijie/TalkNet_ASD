@@ -2,7 +2,7 @@ import subprocess
 import sys
 import time
 import os
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'  # Suppress TensorFlow logging
+# os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'  # Suppress TensorFlow logging
 import tqdm
 import torch
 import argparse
