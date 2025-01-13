@@ -46,8 +46,10 @@ parser = argparse.ArgumentParser(
 
 parser.add_argument('--videoName',             type=str,
                     default="001",   help='Demo video name')
-parser.add_argument('--videoFolder',           type=str,
-                    default="demo",  help='Path for inputs, tmps and outputs')
+parser.add_argument('--videoFolderInput',           type=str,
+                    default="demo",  help='Path for inputs')
+parser.add_argument('--videoFolderOutput',           type=str,
+                    default="output_dir",  help='Path for tmps and outputs')
 parser.add_argument('--pretrainModel',         type=str,
                     default="pretrain_TalkSet.model",   help='Path for the pretrained TalkNet model')
 parser.add_argument('--fps',                   type=float,
@@ -126,9 +128,9 @@ if args.evalCol == True:
         os.remove(args.videoFolder + '/col_labels.tar.gz')
 else:
     args.videoPath = glob.glob(os.path.join(
-        args.videoFolder, args.videoName + '.*'))[0]
-    args.savePath = os.path.join(args.videoFolder, args.videoName)
-
+        args.videoFolderInput, args.videoName + '.*'))[0]
+    # args.savePath = os.path.join(args.videoFolderOutput, args.videoName)
+    args.savePath = args.videoFolderOutput
 
 def scene_detect(args):
     # CPU: Scene detection, output is the list of each shot's time duration
@@ -501,6 +503,7 @@ def main():
     # │   ├── 000001.jpg
     # │   ├── 000002.jpg
     # │   └── ...
+    # |── pyfilter (Output clipped videoes)
     # └── pywork
     #     ├── faces.pckl (face detection result)
     #     ├── scene.pckl (scene detection result)
@@ -513,9 +516,12 @@ def main():
     args.pyframesPath = os.path.join(args.savePath, 'pyframes')
     args.pyworkPath = os.path.join(args.savePath, 'pywork')
     args.pycropPath = os.path.join(args.savePath, 'pycrop')
-    args.pyfilteredSegments = os.path.join(args.savePath, 'pyfilter')
-    if os.path.exists(args.savePath):
-        rmtree(args.savePath)
+    args.pyfilteredVideo = os.path.join(args.savePath, 'pyfilter', 'video')
+    args.pyfilteredAudio = os.path.join(args.savePath, 'pyfilter', 'audio')
+    
+    # if os.path.exists(args.savePath):
+    #     rmtree(args.savePath)
+    
     # The path for the input video, input audio, output video
     os.makedirs(args.pyaviPath, exist_ok=True)
     os.makedirs(args.pyframesPath, exist_ok=True)  # Save all the video frames
@@ -524,7 +530,9 @@ def main():
     # Save the detected face clips (audio+video) in this process
     os.makedirs(args.pycropPath, exist_ok=True)
     # Save the detected face clips (audio+video) in this process
-    os.makedirs(args.pyfilteredSegments, exist_ok=True)
+    os.makedirs(args.pyfilteredVideo, exist_ok=True)
+    # Save the detected face clips (audio+video) in this process
+    os.makedirs(args.pyfilteredAudio, exist_ok=True)
 
     # Extract video
     args.videoFilePath = os.path.join(args.pyaviPath, 'video.avi')
@@ -706,9 +714,9 @@ def main():
             seg_idx = 0
             seg_start, seg_end = segment_frames[0]
             segment_video_path = os.path.join(
-                args.pyfilteredSegments, f"{ii:05d}_segment_{seg_idx:02d}.avi")
+                args.pyfilteredVideo, f"{args.videoName}_track_{ii:05d}_segment_{seg_idx:02d}.avi")
             segment_audio_path = os.path.join(
-                args.pyfilteredSegments, f"{ii:05d}_segment_{seg_idx:02d}.wav")
+                args.pyfilteredAudio, f"{args.videoName}_track_{ii:05d}_segment_{seg_idx:02d}.wav")
             track_path = os.path.join(args.pycropPath, '%05d' % ii)
             extract_segment(track_path, seg_start+10, seg_end-10, segment_video_path, segment_audio_path)
             filtered_segments.append(segment_video_path)
@@ -721,13 +729,23 @@ def main():
     sys.stderr.write(
         f"{time.strftime('%Y-%m-%d %H:%M:%S')} Filtered segments saved in {savePath}\n")
 
-    if args.evalCol == True:
-        # The columnbia video is too big for visualization. You can still add the `visualization` funcition here if you want
-        evaluate_col_ASD(vidTracks, scores, args)
-        quit()
-    else:
-        # Visualization, save the result as the new video
-        visualization(vidTracks, scores, args)
+    # if args.evalCol == True:
+    #     # The columnbia video is too big for visualization. You can still add the `visualization` funcition here if you want
+    #     evaluate_col_ASD(vidTracks, scores, args)
+    #     quit()
+    # else:
+    #     # Visualization, save the result as the new video
+    #     visualization(vidTracks, scores, args)
+
+# At the end of the main function
+folders_to_keep = [args.pyfilteredVideo, args.pyfilteredAudio]
+folders_to_delete = [args.pyaviPath, args.pyframesPath, args.pyworkPath, args.pycropPath]
+
+for folder in folders_to_delete:
+    if folder not in folders_to_keep and os.path.exists(folder):
+        rmtree(folder)
+sys.stderr.write(
+    f"{time.strftime('%Y-%m-%d %H:%M:%S')} Removed unnecessary folders after processing.\n")
 
 
 if __name__ == '__main__':
