@@ -58,7 +58,7 @@ parser.add_argument('--pretrainModel',         type=str,
 parser.add_argument('--fps',                   type=float,
                     default=25,   help='Desired FPS')
 parser.add_argument('--frame_size',                   type=int,
-                    default=512,   help='Desired frame size')
+                    default=256,   help='Desired frame size')
 
 parser.add_argument('--angleThreshold',                   type=int,
                     default=10,   help='Desired threshold for yaw')
