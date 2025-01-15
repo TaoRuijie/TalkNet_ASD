@@ -193,7 +193,7 @@ import sys
 
 def inference_video(args):
     # Load the YOLOv11n-face model
-    model = YOLO('./model/yolov11n-face.pt')  # Path to the YOLOv11n-face model
+    model = YOLO('./model/faceDetector/yolov11n-face.pt')  # Path to the YOLOv11n-face model
 
     flist = glob.glob(os.path.join(args.pyframesPath, '*.jpg'))
     flist.sort()
