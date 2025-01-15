@@ -58,7 +58,7 @@ parser.add_argument('--pretrainModel',         type=str,
 parser.add_argument('--fps',                   type=float,
                     default=25,   help='Desired FPS')
 parser.add_argument('--frame_size',                   type=int,
-                    default=256,   help='Desired frame size')
+                    default=512,   help='Desired frame size')
 
 parser.add_argument('--angleThreshold',                   type=int,
                     default=10,   help='Desired threshold for yaw')
@@ -141,8 +141,10 @@ def scene_detect(args):
 
     sceneManager = SceneManager()
 
-    sceneManager.add_detector(ContentDetector(threshold=args.contentDetectorThreshold, min_scene_len=30))
-    sceneManager.add_detector(ThresholdDetector(threshold=args.thresholdDetectorThreshold))
+    # sceneManager.add_detector(ContentDetector(threshold=args.contentDetectorThreshold, min_scene_len=30))
+    # sceneManager.add_detector(ThresholdDetector(threshold=args.thresholdDetectorThreshold))
+    sceneManager.add_detector(ContentDetector())
+    sceneManager.add_detector(ThresholdDetector())
 
     sceneManager.detect_scenes(video)
     sceneList = sceneManager.get_scene_list()
