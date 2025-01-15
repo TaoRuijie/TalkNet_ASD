@@ -240,7 +240,7 @@ def inference_video(args):
         image = cv2.imread(fname)
 
         # Perform face detection
-        results = model.predict(image, conf=0.8, verbose=False)  # Use .predict()
+        results = model.predict(image, conf=0.5, verbose=False)  # Use .predict()
 
         # Extract detections
         dets.append([])
@@ -248,7 +248,7 @@ def inference_video(args):
             detections = results[0].boxes.data.cpu().numpy()  # Bounding box data
             for det in detections:
                 x1, y1, x2, y2, conf = det[:5]  # Parse bounding box and confidence
-                if conf > 0.8:  # Check confidence threshold
+                if conf > 0.5:  # Check confidence threshold
                     dets[-1].append({
                         'frame': fidx,
                         'bbox': [x1, y1, x2, y2],
