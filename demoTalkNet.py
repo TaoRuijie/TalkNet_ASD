@@ -205,7 +205,7 @@ def inference_video(args):
         imageRGB = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
         # Perform face detection
-        results = model.predict(imageRGB, conf=args.conf_th)  # Confidence threshold
+        results = model.predict(imageRGB, conf=0.8)  # Confidence threshold
 
         dets.append([])
         for result in results:
