@@ -58,7 +58,7 @@ parser.add_argument('--pretrainModel',         type=str,
 parser.add_argument('--fps',                   type=float,
                     default=25,   help='Desired FPS')
 parser.add_argument('--frame_size',                   type=int,
-                    default=256,   help='Desired frame size')
+                    default=512,   help='Desired frame size')
 
 parser.add_argument('--angleThreshold',                   type=int,
                     default=10,   help='Desired threshold for yaw')
@@ -158,27 +158,74 @@ def scene_detect(args):
     return sceneList
 
 
+# def inference_video(args):
+#     # GPU: Face detection, output is the list contains the face location and score in this frame
+#     DET = S3FD(device='cuda')
+#     flist = glob.glob(os.path.join(args.pyframesPath, '*.jpg'))
+#     flist.sort()
+#     dets = []
+#     for fidx, fname in enumerate(flist):
+#         image = cv2.imread(fname)
+#         imageNumpy = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+#         bboxes = DET.detect_faces(
+#             imageNumpy, conf_th=0.9, scales=[args.facedetScale])
+#         dets.append([])
+#         for bbox in bboxes:
+#             # dets has the frames info, bbox info, conf info
+#             dets[-1].append({'frame': fidx, 'bbox': (bbox[:-1]
+#                                                      ).tolist(), 'conf': bbox[-1]})
+#         sys.stderr.write('%s-%05d; %d dets\r' %
+#                          (args.videoFilePath, fidx, len(dets[-1])))
+#     savePath = os.path.join(args.pyworkPath, 'faces.pckl')
+#     with open(savePath, 'wb') as fil:
+#         pickle.dump(dets, fil)
+#     return dets
+
+
+import os
+import glob
+import cv2
+import torch
+from ultralytics import YOLO  # YOLOv8 library
+import pickle
+import sys
+
+
 def inference_video(args):
-    # GPU: Face detection, output is the list contains the face location and score in this frame
-    DET = S3FD(device='cuda')
+    # Load the YOLOv11n-face model
+    model = YOLO('./model/yolov11n-face.pt')  # Path to the YOLOv11n-face model
+
     flist = glob.glob(os.path.join(args.pyframesPath, '*.jpg'))
     flist.sort()
     dets = []
+
     for fidx, fname in enumerate(flist):
+        # Read the frame
         image = cv2.imread(fname)
-        imageNumpy = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-        bboxes = DET.detect_faces(
-            imageNumpy, conf_th=0.9, scales=[args.facedetScale])
+        imageRGB = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+
+        # Perform face detection
+        results = model.predict(imageRGB, conf=args.conf_th)  # Confidence threshold
+
         dets.append([])
-        for bbox in bboxes:
-            # dets has the frames info, bbox info, conf info
-            dets[-1].append({'frame': fidx, 'bbox': (bbox[:-1]
-                                                     ).tolist(), 'conf': bbox[-1]})
+        for result in results:
+            for bbox in result.boxes.data:
+                x1, y1, x2, y2, conf = bbox.tolist()
+                dets[-1].append({
+                    'frame': fidx,
+                    'bbox': [x1, y1, x2, y2],
+                    'conf': conf
+                })
+
+        # Log progress
         sys.stderr.write('%s-%05d; %d dets\r' %
                          (args.videoFilePath, fidx, len(dets[-1])))
+
+    # Save detections
     savePath = os.path.join(args.pyworkPath, 'faces.pckl')
     with open(savePath, 'wb') as fil:
         pickle.dump(dets, fil)
+
     return dets
 
 
@@ -648,8 +695,8 @@ def main():
                      " Scores extracted and saved in %s \r\n" % args.pyworkPath)
 
     # Frame rate of the video (assumed 25 FPS)
-    MIN_SEGMENT_FRAMES = 2 * args.fps  # Minimum segment length in frames
-    MAX_SEGMENT_FRAMES = 5 * args.fps  # Maximum segment length in frames
+    MIN_SEGMENT_FRAMES = 4 * args.fps  # Minimum segment length in frames
+    MAX_SEGMENT_FRAMES = 10 * args.fps  # Maximum segment length in frames
 
     filtered_segments = []
     count_segments = 0
