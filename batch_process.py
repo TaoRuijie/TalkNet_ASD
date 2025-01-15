@@ -29,6 +29,7 @@ def main(args):
             "--videoName", video_name,
             "--videoFolderInput", args.videoFolderInput,
             "--videoFolderOutput", args.videoFolderOutput,
+            "--frame_size", args.frame_size,
         ]
 
         # Print and execute the command
@@ -45,7 +46,7 @@ if __name__ == "__main__":
     parser.add_argument('--videoFolderOutput', type=str, required=True, help='Path to the folder for storing outputs and temporary files.')
     parser.add_argument('--pretrainModel', type=str,default="pretrain_TalkSet.model", help='Path to the pretrained TalkNet model.')
     parser.add_argument('--fps', type=float, default=25, help='Desired FPS.')
-    parser.add_argument('--frame_size', type=int, default=256, help='Desired frame size.')
+    parser.add_argument('--frame_size', type=int, default=512, help='Desired frame size.')
     parser.add_argument('--angleThreshold', type=int, default=10, help='Yaw threshold.')
     parser.add_argument('--contentDetectorThreshold', type=float, default=27.0, help='Content detector threshold.')
     parser.add_argument('--thresholdDetectorThreshold', type=float, default=30.0, help='Threshold detector threshold.')

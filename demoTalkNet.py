@@ -141,10 +141,10 @@ def scene_detect(args):
 
     sceneManager = SceneManager()
 
-    # sceneManager.add_detector(ContentDetector(threshold=args.contentDetectorThreshold, min_scene_len=30))
-    # sceneManager.add_detector(ThresholdDetector(threshold=args.thresholdDetectorThreshold))
-    sceneManager.add_detector(ContentDetector())
-    sceneManager.add_detector(ThresholdDetector())
+    sceneManager.add_detector(ContentDetector(threshold=args.contentDetectorThreshold, min_scene_len=30))
+    sceneManager.add_detector(ThresholdDetector(threshold=args.thresholdDetectorThreshold))
+    # sceneManager.add_detector(ContentDetector())
+    # sceneManager.add_detector(ThresholdDetector())
 
     sceneManager.detect_scenes(video)
     sceneList = sceneManager.get_scene_list()
@@ -160,28 +160,28 @@ def scene_detect(args):
     return sceneList
 
 
-def inference_video(args):
-    # GPU: Face detection, output is the list contains the face location and score in this frame
-    DET = S3FD(device='cuda')
-    flist = glob.glob(os.path.join(args.pyframesPath, '*.jpg'))
-    flist.sort()
-    dets = []
-    for fidx, fname in enumerate(flist):
-        image = cv2.imread(fname)
-        imageNumpy = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-        bboxes = DET.detect_faces(
-            imageNumpy, conf_th=0.9, scales=[args.facedetScale])
-        dets.append([])
-        for bbox in bboxes:
-            # dets has the frames info, bbox info, conf info
-            dets[-1].append({'frame': fidx, 'bbox': (bbox[:-1]
-                                                     ).tolist(), 'conf': bbox[-1]})
-        sys.stderr.write('%s-%05d; %d dets\r' %
-                         (args.videoFilePath, fidx, len(dets[-1])))
-    savePath = os.path.join(args.pyworkPath, 'faces.pckl')
-    with open(savePath, 'wb') as fil:
-        pickle.dump(dets, fil)
-    return dets
+# def inference_video(args):
+#     # GPU: Face detection, output is the list contains the face location and score in this frame
+#     DET = S3FD(device='cuda')
+#     flist = glob.glob(os.path.join(args.pyframesPath, '*.jpg'))
+#     flist.sort()
+#     dets = []
+#     for fidx, fname in enumerate(flist):
+#         image = cv2.imread(fname)
+#         imageNumpy = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+#         bboxes = DET.detect_faces(
+#             imageNumpy, conf_th=0.9, scales=[args.facedetScale])
+#         dets.append([])
+#         for bbox in bboxes:
+#             # dets has the frames info, bbox info, conf info
+#             dets[-1].append({'frame': fidx, 'bbox': (bbox[:-1]
+#                                                      ).tolist(), 'conf': bbox[-1]})
+#         sys.stderr.write('%s-%05d; %d dets\r' %
+#                          (args.videoFilePath, fidx, len(dets[-1])))
+#     savePath = os.path.join(args.pyworkPath, 'faces.pckl')
+#     with open(savePath, 'wb') as fil:
+#         pickle.dump(dets, fil)
+#     return dets
 
 
 import os
@@ -193,40 +193,40 @@ import pickle
 import sys
 
 
-# def inference_video(args):
-#     # Load the YOLOv11n-face model
-#     model = YOLO('./model/faceDetector/yolov11n-face.pt')  # Path to the YOLOv11n-face model
+def inference_video(args):
+    # Load the YOLOv11n-face model
+    model = YOLO('./model/faceDetector/yolov11n-face.pt')  # Path to the YOLOv11n-face model
 
-#     flist = glob.glob(os.path.join(args.pyframesPath, '*.jpg'))
-#     flist.sort()
-#     dets = []
+    flist = glob.glob(os.path.join(args.pyframesPath, '*.jpg'))
+    flist.sort()
+    dets = []
 
-#     for fidx, fname in enumerate(flist):
-#         # Read the frame
-#         image = cv2.imread(fname)
-#         results = model(image, verbose=False)
-#         detections = results[0].boxes.data.cpu().numpy()
+    for fidx, fname in enumerate(flist):
+        # Read the frame
+        image = cv2.imread(fname)
+        results = model(image, verbose=False)
+        detections = results[0].boxes.data.cpu().numpy()
 
-#         dets.append([])
-#         for det in detections:
-#             x1, y1, x2, y2, conf, class_id = det
-#             if conf>0.5:
-#                 dets[-1].append({
-#                     'frame': fidx,
-#                     'bbox': [x1, y1, x2, y2],
-#                     'conf': conf
-#                 })
+        dets.append([])
+        for det in detections:
+            x1, y1, x2, y2, conf, class_id = det
+            if conf>0.8:
+                dets[-1].append({
+                    'frame': fidx,
+                    'bbox': [x1, y1, x2, y2],
+                    'conf': conf
+                })
 
-#         # Log progress
-#         sys.stderr.write('%s-%05d; %d dets\r' %
-#                          (args.videoFilePath, fidx, len(dets[-1])))
+        # Log progress
+        sys.stderr.write('%s-%05d; %d dets\r' %
+                         (args.videoFilePath, fidx, len(dets[-1])))
 
-#     # Save detections
-#     savePath = os.path.join(args.pyworkPath, 'faces.pckl')
-#     with open(savePath, 'wb') as fil:
-#         pickle.dump(dets, fil)
+    # Save detections
+    savePath = os.path.join(args.pyworkPath, 'faces.pckl')
+    with open(savePath, 'wb') as fil:
+        pickle.dump(dets, fil)
 
-#     return dets
+    return dets
 
 # def inference_video(args):
 #     # Load the YOLOv11n-face model
@@ -242,7 +242,7 @@ import sys
 #         image = cv2.imread(fname)
 
 #         # Perform face detection
-#         results = model.predict(image, conf=0.5, verbose=False)  # Use .predict()
+#         results = model.predict(image, conf=0.8, verbose=False)  # Use .predict()
 
 #         # Extract detections
 #         dets.append([])
@@ -250,7 +250,7 @@ import sys
 #             detections = results[0].boxes.data.cpu().numpy()  # Bounding box data
 #             for det in detections:
 #                 x1, y1, x2, y2, conf = det[:5]  # Parse bounding box and confidence
-#                 if conf > 0.5:  # Check confidence threshold
+#                 if conf > 0.8:  # Check confidence threshold
 #                     dets[-1].append({
 #                         'frame': fidx,
 #                         'bbox': [x1, y1, x2, y2],
@@ -734,7 +734,7 @@ def main():
                      " Scores extracted and saved in %s \r\n" % args.pyworkPath)
 
     # Frame rate of the video (assumed 25 FPS)
-    MIN_SEGMENT_FRAMES = 4 * args.fps  # Minimum segment length in frames
+    MIN_SEGMENT_FRAMES = 3 * args.fps  # Minimum segment length in frames
     MAX_SEGMENT_FRAMES = 10 * args.fps  # Maximum segment length in frames
 
     filtered_segments = []
