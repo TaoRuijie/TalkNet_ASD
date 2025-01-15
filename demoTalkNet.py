@@ -202,15 +202,13 @@ def inference_video(args):
     for fidx, fname in enumerate(flist):
         # Read the frame
         image = cv2.imread(fname)
-        imageRGB = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-
-        # Perform face detection
-        results = model.predict(imageRGB, conf=0.8)  # Confidence threshold
+        results = model(image, verbose=False)
+        detections = results[0].boxes.data.cpu().numpy()
 
         dets.append([])
-        for result in results:
-            for bbox in result.boxes.data:
-                x1, y1, x2, y2, conf = bbox.tolist()
+        for det in detections:
+            x1, y1, x2, y2, conf, class_id = det
+            if conf>0.8:
                 dets[-1].append({
                     'frame': fidx,
                     'bbox': [x1, y1, x2, y2],
