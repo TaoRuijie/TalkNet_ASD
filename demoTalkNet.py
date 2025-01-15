@@ -160,28 +160,28 @@ def scene_detect(args):
     return sceneList
 
 
-# def inference_video(args):
-#     # GPU: Face detection, output is the list contains the face location and score in this frame
-#     DET = S3FD(device='cuda')
-#     flist = glob.glob(os.path.join(args.pyframesPath, '*.jpg'))
-#     flist.sort()
-#     dets = []
-#     for fidx, fname in enumerate(flist):
-#         image = cv2.imread(fname)
-#         imageNumpy = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-#         bboxes = DET.detect_faces(
-#             imageNumpy, conf_th=0.9, scales=[args.facedetScale])
-#         dets.append([])
-#         for bbox in bboxes:
-#             # dets has the frames info, bbox info, conf info
-#             dets[-1].append({'frame': fidx, 'bbox': (bbox[:-1]
-#                                                      ).tolist(), 'conf': bbox[-1]})
-#         sys.stderr.write('%s-%05d; %d dets\r' %
-#                          (args.videoFilePath, fidx, len(dets[-1])))
-#     savePath = os.path.join(args.pyworkPath, 'faces.pckl')
-#     with open(savePath, 'wb') as fil:
-#         pickle.dump(dets, fil)
-#     return dets
+def inference_video(args):
+    # GPU: Face detection, output is the list contains the face location and score in this frame
+    DET = S3FD(device='cuda')
+    flist = glob.glob(os.path.join(args.pyframesPath, '*.jpg'))
+    flist.sort()
+    dets = []
+    for fidx, fname in enumerate(flist):
+        image = cv2.imread(fname)
+        imageNumpy = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        bboxes = DET.detect_faces(
+            imageNumpy, conf_th=0.9, scales=[args.facedetScale])
+        dets.append([])
+        for bbox in bboxes:
+            # dets has the frames info, bbox info, conf info
+            dets[-1].append({'frame': fidx, 'bbox': (bbox[:-1]
+                                                     ).tolist(), 'conf': bbox[-1]})
+        sys.stderr.write('%s-%05d; %d dets\r' %
+                         (args.videoFilePath, fidx, len(dets[-1])))
+    savePath = os.path.join(args.pyworkPath, 'faces.pckl')
+    with open(savePath, 'wb') as fil:
+        pickle.dump(dets, fil)
+    return dets
 
 
 import os
@@ -193,40 +193,40 @@ import pickle
 import sys
 
 
-def inference_video(args):
-    # Load the YOLOv11n-face model
-    model = YOLO('./model/faceDetector/yolov11n-face.pt')  # Path to the YOLOv11n-face model
+# def inference_video(args):
+#     # Load the YOLOv11n-face model
+#     model = YOLO('./model/faceDetector/yolov11n-face.pt')  # Path to the YOLOv11n-face model
 
-    flist = glob.glob(os.path.join(args.pyframesPath, '*.jpg'))
-    flist.sort()
-    dets = []
+#     flist = glob.glob(os.path.join(args.pyframesPath, '*.jpg'))
+#     flist.sort()
+#     dets = []
 
-    for fidx, fname in enumerate(flist):
-        # Read the frame
-        image = cv2.imread(fname)
-        results = model(image, verbose=False)
-        detections = results[0].boxes.data.cpu().numpy()
+#     for fidx, fname in enumerate(flist):
+#         # Read the frame
+#         image = cv2.imread(fname)
+#         results = model(image, verbose=False)
+#         detections = results[0].boxes.data.cpu().numpy()
 
-        dets.append([])
-        for det in detections:
-            x1, y1, x2, y2, conf, class_id = det
-            if conf>0.8:
-                dets[-1].append({
-                    'frame': fidx,
-                    'bbox': [x1, y1, x2, y2],
-                    'conf': conf
-                })
+#         dets.append([])
+#         for det in detections:
+#             x1, y1, x2, y2, conf, class_id = det
+#             if conf>0.8:
+#                 dets[-1].append({
+#                     'frame': fidx,
+#                     'bbox': [x1, y1, x2, y2],
+#                     'conf': conf
+#                 })
 
-        # Log progress
-        sys.stderr.write('%s-%05d; %d dets\r' %
-                         (args.videoFilePath, fidx, len(dets[-1])))
+#         # Log progress
+#         sys.stderr.write('%s-%05d; %d dets\r' %
+#                          (args.videoFilePath, fidx, len(dets[-1])))
 
-    # Save detections
-    savePath = os.path.join(args.pyworkPath, 'faces.pckl')
-    with open(savePath, 'wb') as fil:
-        pickle.dump(dets, fil)
+#     # Save detections
+#     savePath = os.path.join(args.pyworkPath, 'faces.pckl')
+#     with open(savePath, 'wb') as fil:
+#         pickle.dump(dets, fil)
 
-    return dets
+#     return dets
 
 # def inference_video(args):
 #     # Load the YOLOv11n-face model
