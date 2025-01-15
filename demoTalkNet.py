@@ -208,7 +208,7 @@ def inference_video(args):
         dets.append([])
         for det in detections:
             x1, y1, x2, y2, conf, class_id = det
-            if conf>0.8:
+            if conf>0.5:
                 dets[-1].append({
                     'frame': fidx,
                     'bbox': [x1, y1, x2, y2],
