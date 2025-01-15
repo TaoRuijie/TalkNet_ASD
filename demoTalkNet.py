@@ -240,7 +240,7 @@ def inference_video(args):
         image = cv2.imread(fname)
 
         # Perform face detection
-        results = model.predict(image, conf=args.conf_th, verbose=False)  # Use .predict()
+        results = model.predict(image, conf=0.8, verbose=False)  # Use .predict()
 
         # Extract detections
         dets.append([])
