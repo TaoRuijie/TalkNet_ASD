@@ -61,7 +61,7 @@ parser.add_argument('--frame_size',                   type=int,
                     default=512,   help='Desired frame size')
 
 parser.add_argument('--angleThreshold',                   type=int,
-                    default=10,   help='Desired threshold for yaw')
+                    default=30,   help='Desired threshold for yaw')
 parser.add_argument('--contentDetectorThreshold',                   type=float,
                     default=27.0,   help='Desired frame size')
 parser.add_argument('--thresholdDetectorThreshold',                   type=float,
@@ -735,7 +735,7 @@ def main():
 
     # Frame rate of the video (assumed 25 FPS)
     MIN_SEGMENT_FRAMES = 2 * args.fps  # Minimum segment length in frames
-    MAX_SEGMENT_FRAMES = 10 * args.fps  # Maximum segment length in frames
+    MAX_SEGMENT_FRAMES = 5 * args.fps  # Maximum segment length in frames
 
     filtered_segments = []
     count_segments = 0
