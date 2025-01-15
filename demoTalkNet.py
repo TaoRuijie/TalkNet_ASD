@@ -191,10 +191,46 @@ import pickle
 import sys
 
 
+# def inference_video(args):
+#     # Load the YOLOv11n-face model
+#     model = YOLO('./model/faceDetector/yolov11n-face.pt')  # Path to the YOLOv11n-face model
+
+#     flist = glob.glob(os.path.join(args.pyframesPath, '*.jpg'))
+#     flist.sort()
+#     dets = []
+
+#     for fidx, fname in enumerate(flist):
+#         # Read the frame
+#         image = cv2.imread(fname)
+#         results = model(image, verbose=False)
+#         detections = results[0].boxes.data.cpu().numpy()
+
+#         dets.append([])
+#         for det in detections:
+#             x1, y1, x2, y2, conf, class_id = det
+#             if conf>0.5:
+#                 dets[-1].append({
+#                     'frame': fidx,
+#                     'bbox': [x1, y1, x2, y2],
+#                     'conf': conf
+#                 })
+
+#         # Log progress
+#         sys.stderr.write('%s-%05d; %d dets\r' %
+#                          (args.videoFilePath, fidx, len(dets[-1])))
+
+#     # Save detections
+#     savePath = os.path.join(args.pyworkPath, 'faces.pckl')
+#     with open(savePath, 'wb') as fil:
+#         pickle.dump(dets, fil)
+
+#     return dets
+
 def inference_video(args):
     # Load the YOLOv11n-face model
     model = YOLO('./model/faceDetector/yolov11n-face.pt')  # Path to the YOLOv11n-face model
 
+    # Get list of all frame image files
     flist = glob.glob(os.path.join(args.pyframesPath, '*.jpg'))
     flist.sort()
     dets = []
@@ -202,30 +238,33 @@ def inference_video(args):
     for fidx, fname in enumerate(flist):
         # Read the frame
         image = cv2.imread(fname)
-        results = model(image, verbose=False)
-        detections = results[0].boxes.data.cpu().numpy()
 
+        # Perform face detection
+        results = model.predict(image, conf=args.conf_th, verbose=False)  # Use .predict()
+
+        # Extract detections
         dets.append([])
-        for det in detections:
-            x1, y1, x2, y2, conf, class_id = det
-            if conf>0.5:
-                dets[-1].append({
-                    'frame': fidx,
-                    'bbox': [x1, y1, x2, y2],
-                    'conf': conf
-                })
+        if results[0].boxes:
+            detections = results[0].boxes.data.cpu().numpy()  # Bounding box data
+            for det in detections:
+                x1, y1, x2, y2, conf = det[:5]  # Parse bounding box and confidence
+                if conf > args.conf_th:  # Check confidence threshold
+                    dets[-1].append({
+                        'frame': fidx,
+                        'bbox': [x1, y1, x2, y2],
+                        'conf': conf
+                    })
 
         # Log progress
         sys.stderr.write('%s-%05d; %d dets\r' %
                          (args.videoFilePath, fidx, len(dets[-1])))
 
-    # Save detections
+    # Save detections to a file
     savePath = os.path.join(args.pyworkPath, 'faces.pckl')
     with open(savePath, 'wb') as fil:
         pickle.dump(dets, fil)
 
     return dets
-
 
 def bb_intersection_over_union(boxA, boxB, evalCol=False):
     # CPU: IOU Function to calculate overlap between two image
