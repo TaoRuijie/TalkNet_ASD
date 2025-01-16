@@ -58,7 +58,7 @@ parser.add_argument('--pretrainModel',         type=str,
 parser.add_argument('--fps',                   type=float,
                     default=25,   help='Desired FPS')
 parser.add_argument('--frame_size',                   type=int,
-                    default=512,   help='Desired frame size')
+                    default=256,   help='Desired frame size')
 
 parser.add_argument('--angleThreshold',                   type=int,
                     default=25,   help='Desired threshold for yaw')
@@ -184,13 +184,13 @@ def inference_video(args):
     return dets
 
 
-import os
-import glob
-import cv2
-import torch
-from ultralytics import YOLO  # YOLOv8 library
-import pickle
-import sys
+# import os
+# import glob
+# import cv2
+# import torch
+# from ultralytics import YOLO  # YOLOv8 library
+# import pickle
+# import sys
 
 
 # def inference_video(args):
@@ -735,7 +735,7 @@ def main():
 
     # Frame rate of the video (assumed 25 FPS)
     MIN_SEGMENT_FRAMES = 2 * args.fps  # Minimum segment length in frames
-    MAX_SEGMENT_FRAMES = 10 * args.fps  # Maximum segment length in frames
+    MAX_SEGMENT_FRAMES = 5 * args.fps  # Maximum segment length in frames
 
     filtered_segments = []
     count_segments = 0
