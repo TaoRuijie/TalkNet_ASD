@@ -61,7 +61,7 @@ parser.add_argument('--frame_size',                   type=int,
                     default=512,   help='Desired frame size')
 
 parser.add_argument('--angleThreshold',                   type=int,
-                    default=30,   help='Desired threshold for yaw')
+                    default=25,   help='Desired threshold for yaw')
 parser.add_argument('--contentDetectorThreshold',                   type=float,
                     default=27.0,   help='Desired frame size')
 parser.add_argument('--thresholdDetectorThreshold',                   type=float,
@@ -132,8 +132,8 @@ if args.evalCol == True:
 else:
     args.videoPath = glob.glob(os.path.join(
         args.videoFolderInput, args.videoName + '.*'))[0]
-    # args.savePath = os.path.join(args.videoFolderOutput, args.videoName)
-    args.savePath = args.videoFolderOutput
+    args.savePath = os.path.join(args.videoFolderOutput, args.videoName)
+    # args.savePath = args.videoFolderOutput
 
 def scene_detect(args):
     # CPU: Scene detection, output is the list of each shot's time duration
@@ -573,7 +573,7 @@ def evaluate_col_ASD(tracks, scores, args):
 
 import subprocess
 
-def extract_segment(track_path, start_frame, end_frame, output_path_video, output_path_audio):
+def extract_segment(track_path, start_frame, end_frame, output_path_video):
     # Convert start_frame and end_frame to time (in seconds)
     start_time = start_frame / args.fps
     end_time = end_frame / args.fps
@@ -642,8 +642,8 @@ def main():
     args.pyframesPath = os.path.join(args.savePath, 'pyframes')
     args.pyworkPath = os.path.join(args.savePath, 'pywork')
     args.pycropPath = os.path.join(args.savePath, 'pycrop')
-    args.pyfilteredVideo = os.path.join(args.savePath, 'pyfilter', 'video')
-    args.pyfilteredAudio = os.path.join(args.savePath, 'pyfilter', 'audio')
+    args.pyfilteredVideo = os.path.join(args.savePath)
+    # args.pyfilteredAudio = os.path.join(args.savePath, 'pyfilter', 'audio')
     
     # if os.path.exists(args.savePath):
     #     rmtree(args.savePath)
@@ -658,7 +658,7 @@ def main():
     # Save the detected face clips (audio+video) in this process
     os.makedirs(args.pyfilteredVideo, exist_ok=True)
     # Save the detected face clips (audio+video) in this process
-    os.makedirs(args.pyfilteredAudio, exist_ok=True)
+    # os.makedirs(args.pyfilteredAudio, exist_ok=True)
 
     # Extract video
     args.videoFilePath = os.path.join(args.pyaviPath, 'video.avi')
@@ -735,7 +735,7 @@ def main():
 
     # Frame rate of the video (assumed 25 FPS)
     MIN_SEGMENT_FRAMES = 2 * args.fps  # Minimum segment length in frames
-    MAX_SEGMENT_FRAMES = 5 * args.fps  # Maximum segment length in frames
+    MAX_SEGMENT_FRAMES = 10 * args.fps  # Maximum segment length in frames
 
     filtered_segments = []
     count_segments = 0
@@ -841,10 +841,10 @@ def main():
             seg_start, seg_end = segment_frames[0]
             segment_video_path = os.path.join(
                 args.pyfilteredVideo, f"{args.videoName}_track_{ii:05d}_segment_{seg_idx:02d}.avi")
-            segment_audio_path = os.path.join(
-                args.pyfilteredAudio, f"{args.videoName}_track_{ii:05d}_segment_{seg_idx:02d}.wav")
+            # segment_audio_path = os.path.join(
+            #     args.pyfilteredAudio, f"{args.videoName}_track_{ii:05d}_segment_{seg_idx:02d}.wav")
             track_path = os.path.join(args.pycropPath, '%05d' % ii)
-            extract_segment(track_path, seg_start+10, seg_end-10, segment_video_path, segment_audio_path)
+            extract_segment(track_path, seg_start+10, seg_end-10, segment_video_path)
             filtered_segments.append(segment_video_path)
 
     print("Found ", count_segments, " Segments")
@@ -864,7 +864,7 @@ def main():
     #     visualization(vidTracks, scores, args)
 
     # At the end of the main function
-    folders_to_keep = [args.pyfilteredVideo, args.pyfilteredAudio]
+    folders_to_keep = [args.pyfilteredVideo]
     folders_to_delete = [args.pyaviPath, args.pyframesPath, args.pyworkPath, args.pycropPath]
 
     for folder in folders_to_delete:
