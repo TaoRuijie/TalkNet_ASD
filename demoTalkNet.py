@@ -735,7 +735,7 @@ def main():
 
     # Frame rate of the video (assumed 25 FPS)
     MIN_SEGMENT_FRAMES = 2 * args.fps  # Minimum segment length in frames
-    MAX_SEGMENT_FRAMES = 5 * args.fps  # Maximum segment length in frames
+    MAX_SEGMENT_FRAMES = 10 * args.fps  # Maximum segment length in frames
 
     filtered_segments = []
     count_segments = 0
