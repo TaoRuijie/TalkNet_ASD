@@ -864,8 +864,10 @@ def main():
         visualization(vidTracks, scores, args)
 
     # At the end of the main function
-    folders_to_keep = [args.pyaviPath, args.pyfilteredVideo]
-    folders_to_delete = [args.pyframesPath, args.pyworkPath, args.pycropPath]
+    # folders_to_keep = [args.pyfilteredVideo]
+    # folders_to_delete = [args.pyaviPath ,args.pyframesPath, args.pyworkPath, args.pycropPath]
+    folders_to_keep = [args.pyfilteredVideo, args.pyaviPath ,args.pyframesPath, args.pyworkPath, args.pycropPath]
+    folders_to_delete = []
 
     for folder in folders_to_delete:
         if folder not in folders_to_keep and os.path.exists(folder):
