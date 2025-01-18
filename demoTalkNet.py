@@ -735,7 +735,7 @@ def main():
 
     # Frame rate of the video (assumed 25 FPS)
     MIN_SEGMENT_FRAMES = 2 * args.fps  # Minimum segment length in frames
-    MAX_SEGMENT_FRAMES = 5 * args.fps  # Maximum segment length in frames
+    MAX_SEGMENT_FRAMES = 10 * args.fps  # Maximum segment length in frames
 
     filtered_segments = []
     count_segments = 0
@@ -855,17 +855,17 @@ def main():
     sys.stderr.write(
         f"{time.strftime('%Y-%m-%d %H:%M:%S')} Filtered segments saved in {savePath}\n")
 
-    # if args.evalCol == True:
-    #     # The columnbia video is too big for visualization. You can still add the `visualization` funcition here if you want
-    #     evaluate_col_ASD(vidTracks, scores, args)
-    #     quit()
-    # else:
-    #     # Visualization, save the result as the new video
-    #     visualization(vidTracks, scores, args)
+    if args.evalCol == True:
+        # The columnbia video is too big for visualization. You can still add the `visualization` funcition here if you want
+        evaluate_col_ASD(vidTracks, scores, args)
+        quit()
+    else:
+        # Visualization, save the result as the new video
+        visualization(vidTracks, scores, args)
 
     # At the end of the main function
-    folders_to_keep = [args.pyfilteredVideo]
-    folders_to_delete = [args.pyaviPath, args.pyframesPath, args.pyworkPath, args.pycropPath]
+    folders_to_keep = [args.pyaviPath, args.pyfilteredVideo]
+    folders_to_delete = [args.pyframesPath, args.pyworkPath, args.pycropPath]
 
     for folder in folders_to_delete:
         if folder not in folders_to_keep and os.path.exists(folder):
