@@ -58,7 +58,7 @@ parser.add_argument('--pretrainModel',         type=str,
 parser.add_argument('--fps',                   type=float,
                     default=25,   help='Desired FPS')
 parser.add_argument('--frame_size',                   type=int,
-                    default=256,   help='Desired frame size')
+                    default=512,   help='Desired frame size')
 
 parser.add_argument('--angleThreshold',                   type=int,
                     default=25,   help='Desired threshold for yaw')
@@ -856,19 +856,19 @@ def main():
     sys.stderr.write(
         f"{time.strftime('%Y-%m-%d %H:%M:%S')} Filtered segments saved in {savePath}\n")
 
-    if args.evalCol == True:
-        # The columnbia video is too big for visualization. You can still add the `visualization` funcition here if you want
-        evaluate_col_ASD(vidTracks, scores, args)
-        quit()
-    else:
-        # Visualization, save the result as the new video
-        visualization(vidTracks, scores, args)
+    # if args.evalCol == True:
+    #     # The columnbia video is too big for visualization. You can still add the `visualization` funcition here if you want
+    #     evaluate_col_ASD(vidTracks, scores, args)
+    #     quit()
+    # else:
+    #     # Visualization, save the result as the new video
+    #     visualization(vidTracks, scores, args)
 
     # At the end of the main function
-    # folders_to_keep = [args.pyfilteredVideo]
-    # folders_to_delete = [args.pyaviPath ,args.pyframesPath, args.pyworkPath, args.pycropPath]
-    folders_to_keep = [args.pyfilteredVideo, args.pyaviPath ,args.pyframesPath, args.pyworkPath, args.pycropPath]
-    folders_to_delete = []
+    folders_to_keep = [args.pyfilteredVideo]
+    folders_to_delete = [args.pyaviPath ,args.pyframesPath, args.pyworkPath, args.pycropPath]
+    # folders_to_keep = [args.pyfilteredVideo, args.pyaviPath ,args.pyframesPath, args.pyworkPath, args.pycropPath]
+    # folders_to_delete = []
 
     for folder in folders_to_delete:
         if folder not in folders_to_keep and os.path.exists(folder):
