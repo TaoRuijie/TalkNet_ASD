@@ -399,7 +399,8 @@ def evaluate_network(files, args):
             ret, frames = video.read()
             if ret == True:
                 face = cv2.cvtColor(frames, cv2.COLOR_BGR2GRAY)
-                face = cv2.resize(face, (args.frame_size, args.frame_size))
+                # face = cv2.resize(face, (args.frame_size, args.frame_size))
+                face = cv2.resize(face, (224, 224))
                 face = face[int(112-(112/2)):int(112+(112/2)),
                             int(112-(112/2)):int(112+(112/2))]
                 videoFeature.append(face)
