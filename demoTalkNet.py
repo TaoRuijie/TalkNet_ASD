@@ -141,9 +141,10 @@ def scene_detect(args):
 
     sceneManager = SceneManager()
 
-    sceneManager.add_detector(ContentDetector(threshold=args.contentDetectorThreshold, min_scene_len=30))
-    sceneManager.add_detector(ThresholdDetector(threshold=args.thresholdDetectorThreshold))
-    # sceneManager.add_detector(ContentDetector())
+    # sceneManager.add_detector(ContentDetector(threshold=args.contentDetectorThreshold, min_scene_len=30))
+    # sceneManager.add_detector(ThresholdDetector(threshold=args.thresholdDetectorThreshold))
+
+    sceneManager.add_detector(ContentDetector())
     # sceneManager.add_detector(ThresholdDetector())
 
     sceneManager.detect_scenes(video)
@@ -629,7 +630,7 @@ def main():
     # │   ├── 000001.jpg
     # │   ├── 000002.jpg
     # │   └── ...
-    # |── pyfilter (Output clipped videoes)
+    # |── pyfilter (Output clipped videos)
     # └── pywork
     #     ├── faces.pckl (face detection result)
     #     ├── scene.pckl (scene detection result)
