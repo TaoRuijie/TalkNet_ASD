@@ -80,7 +80,7 @@ parser.add_argument('--minTrack',              type=int,
 parser.add_argument('--numFailedDet',          type=int,   default=5,
                     help='Number of missed detections allowed before tracking is stopped')
 parser.add_argument('--minFaceSize',           type=int,
-                    default=1,    help='Minimum face size in pixels')
+                    default=200,    help='Minimum face size in pixels')
 parser.add_argument('--cropScale',             type=float,
                     default=0.40, help='Scale bounding box')
 
