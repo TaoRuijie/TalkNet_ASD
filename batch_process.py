@@ -29,7 +29,6 @@ def main(args):
             "--videoName", video_name,
             "--videoFolderInput", args.videoFolderInput,
             "--videoFolderOutput", args.videoFolderOutput,
-            "--frame_size", args.frame_size,
         ]
 
         # Print and execute the command
@@ -42,8 +41,8 @@ def main(args):
 if __name__ == "__main__":
     # Parse arguments for the batch process
     parser = argparse.ArgumentParser(description="Batch Process Videos with demoTalkNet")
-    parser.add_argument('--videoFolderInput', type=str, required=True, help='Path to the folder containing input videos.')
-    parser.add_argument('--videoFolderOutput', type=str, required=True, help='Path to the folder for storing outputs and temporary files.')
+    parser.add_argument('videoFolderInput', type=str, required=True, help='Path to the folder containing input videos.')
+    parser.add_argument('videoFolderOutput', type=str, required=True, help='Path to the folder for storing outputs and temporary files.')
     parser.add_argument('--pretrainModel', type=str,default="pretrain_TalkSet.model", help='Path to the pretrained TalkNet model.')
     parser.add_argument('--fps', type=float, default=25, help='Desired FPS.')
     parser.add_argument('--frame_size', type=int, default=512, help='Desired frame size.')
@@ -54,7 +53,7 @@ if __name__ == "__main__":
     parser.add_argument('--facedetScale', type=float, default=0.25, help='Face detection scale factor.')
     parser.add_argument('--minTrack', type=int, default=40, help='Minimum frames for each shot.')
     parser.add_argument('--numFailedDet', type=int, default=5, help='Missed detections allowed before stopping tracking.')
-    parser.add_argument('--minFaceSize', type=int, default=1, help='Minimum face size in pixels.')
+    parser.add_argument('--minFaceSize', type=int, default=100, help='Minimum face size in pixels.')
     parser.add_argument('--cropScale', type=float, default=0.40, help='Scale bounding box.')
     parser.add_argument('--start', type=int, default=0, help='Start time of the video.')
     parser.add_argument('--duration', type=int, default=0, help='Duration of the video (0 for full video).')

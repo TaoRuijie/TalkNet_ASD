@@ -18,7 +18,6 @@ import python_speech_features
 import mediapipe as mp
 import matplotlib.pyplot as plt
 
-
 import cProfile
 import pstats
 from scipy import signal
@@ -80,7 +79,7 @@ parser.add_argument('--minTrack',              type=int,
 parser.add_argument('--numFailedDet',          type=int,   default=5,
                     help='Number of missed detections allowed before tracking is stopped')
 parser.add_argument('--minFaceSize',           type=int,
-                    default=200,    help='Minimum face size in pixels')
+                    default=100,    help='Minimum face size in pixels')
 parser.add_argument('--cropScale',             type=float,
                     default=0.40, help='Scale bounding box')
 
@@ -138,6 +137,9 @@ else:
 
 from collections import namedtuple
 Scene = namedtuple('Scene', ['frame_num'])
+class Scene:
+    def __init__(self, frame_num):
+        self.frame_num = frame_num
 
 def scene_detect(args):
     # CPU: Scene detection, output is the list of each shot's time duration
