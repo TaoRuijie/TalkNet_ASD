@@ -160,7 +160,7 @@ def scene_detect(args):
         frame_count = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
         # Fallback: If no scenes detected, create a single "scene" from start to end
         # sceneList = [(0, frame_count)]
-        sceneList = [Scene(frame_num=0), Scene(frame_num=frame_count)]
+        sceneList = [(Scene(frame_num=0), Scene(frame_num=frame_count))]
         cap.release()
     with open(savePath, 'wb') as file:
         pickle.dump(sceneList, file)
