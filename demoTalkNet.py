@@ -152,8 +152,11 @@ def scene_detect(args):
 
     savePath = os.path.join(args.pyworkPath, 'scene.pckl')
     if not sceneList:
+        cap = cv2.VideoCapture(args.videoFilePath)
+        frame_count = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
         # Fallback: If no scenes detected, create a single "scene" from start to end
-        sceneList = [(0, video.frame_count)]
+        sceneList = [(0, frame_count)]
+        cap.release()
     with open(savePath, 'wb') as file:
         pickle.dump(sceneList, file)
         sys.stderr.write(f"{args.videoFilePath} - scenes detected: {len(sceneList)}\n")
