@@ -29,6 +29,7 @@ def main(args):
             "--videoName", video_name,
             "--videoFolderInput", args.videoFolderInput,
             "--videoFolderOutput", args.videoFolderOutput,
+            "--channelName", args.channelName,
         ]
 
         # Print and execute the command
@@ -41,8 +42,10 @@ def main(args):
 if __name__ == "__main__":
     # Parse arguments for the batch process
     parser = argparse.ArgumentParser(description="Batch Process Videos with demoTalkNet")
-    parser.add_argument('videoFolderInput', type=str, required=True, help='Path to the folder containing input videos.')
-    parser.add_argument('videoFolderOutput', type=str, required=True, help='Path to the folder for storing outputs and temporary files.')
+    parser.add_argument('--videoFolderInput', type=str, required=True, help='Path to the folder containing input videos.')
+    parser.add_argument('--videoFolderOutput', type=str, help='Path to the folder for storing outputs and temporary files.')
+    parser.add_argument('--bucketName', type=str, help='Path to the folder for storing outputs and temporary files.')
+    parser.add_argument('--channelName', type=str, required=True, help='Path to the folder for storing outputs and temporary files.')
     parser.add_argument('--pretrainModel', type=str,default="pretrain_TalkSet.model", help='Path to the pretrained TalkNet model.')
     parser.add_argument('--fps', type=float, default=25, help='Desired FPS.')
     parser.add_argument('--frame_size', type=int, default=512, help='Desired frame size.')

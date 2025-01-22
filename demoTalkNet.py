@@ -35,6 +35,7 @@ from scenedetect.detectors import ContentDetector
 
 from model.faceDetector.s3fd import S3FD
 from talkNet import talkNet
+from s3_uploader import upload_file_to_s3
 
 warnings.filterwarnings("ignore")
 
@@ -49,7 +50,7 @@ parser = argparse.ArgumentParser(
 parser.add_argument('--videoName',             type=str,
                     default="001",   help='Demo video name')
 parser.add_argument('--videoFolderInput',           type=str,
-                    default="demo",  help='Path for inputs')
+                    required=True,  help='Path for inputs')
 parser.add_argument('--videoFolderOutput',           type=str,
                     default="output_dir",  help='Path for tmps and outputs')
 parser.add_argument('--pretrainModel',         type=str,
@@ -65,10 +66,10 @@ parser.add_argument('--contentDetectorThreshold',                   type=float,
                     default=27.0,   help='Desired frame size')
 parser.add_argument('--thresholdDetectorThreshold',                   type=float,
                     default=30.0,   help='Desired frame size')
-# parser.add_argument('--frame_size',                   type=int,
-                    # default=256,   help='Desired frame size')
-# parser.add_argument('--frame_size',                   type=int,
-                    # default=256,   help='Desired frame size')
+parser.add_argument('--bucketName',                   type=str,
+                    default='hdindiandataset',   help='Bucket Name in AWS')
+parser.add_argument('--channelName',                   type=str,
+                    required=True,   help='Desired frame size')
 
 parser.add_argument('--nDataLoaderThread',     type=int,
                     default=10,   help='Number of workers')
@@ -131,7 +132,9 @@ if args.evalCol == True:
 else:
     args.videoPath = glob.glob(os.path.join(
         args.videoFolderInput, args.videoName + '.*'))[0]
-    args.savePath = os.path.join(args.videoFolderOutput, args.videoName)
+    
+    args.video_id = args.videoName.split('_cluster_')[0]
+    args.savePath = os.path.join(args.videoFolderOutput, args.video_id)
     # args.savePath = args.videoFolderOutput
 
 
@@ -584,7 +587,7 @@ def evaluate_col_ASD(tracks, scores, args):
 
 import subprocess
 
-def extract_segment(track_path, start_frame, end_frame, output_path_video):
+def extract_segment(track_path, start_frame, end_frame, output_path_video, file_name):
     # Convert start_frame and end_frame to time (in seconds)
     start_time = start_frame / args.fps
     end_time = end_frame / args.fps
@@ -614,7 +617,18 @@ def extract_segment(track_path, start_frame, end_frame, output_path_video):
             print("Error during FFmpeg execution:")
             print(result.stderr)  # Print the error message from FFmpeg
         else:
-            print("Segment extracted successfully.")
+            print("Segment extracted successfully, Copying to S3 and deleting local file")
+           
+            s3_object_key = f"{args.channelName}/{args.video_id}/{file_name}"
+            upload_file_to_s3(output_path_video, args.bucketName, s3_object_key)
+
+            # Check if the file exists
+            if os.path.exists(output_path_video):
+                os.remove(output_path_video)
+                print(f"File '{output_path_video}' has been deleted successfully.")
+            else:
+                print(f"File '{output_path_video}' does not exist.")          
+
     
     except Exception as e:
         print(f"Exception occurred while extracting segment: {e}")
@@ -850,12 +864,14 @@ def main():
             # for seg_idx, (seg_start, seg_end) in enumerate(segment_frames):
             seg_idx = 0
             seg_start, seg_end = segment_frames[0]
+            # segment_video_path = os.path.join(
+                # args.pyfilteredVideo, f"{args.videoName}_track_{ii:05d}_segment_{seg_idx:02d}.avi")
             segment_video_path = os.path.join(
-                args.pyfilteredVideo, f"{args.videoName}_track_{ii:05d}_segment_{seg_idx:02d}.avi")
+                args.pyfilteredVideo, f"{ii:05d}.avi")
             # segment_audio_path = os.path.join(
             #     args.pyfilteredAudio, f"{args.videoName}_track_{ii:05d}_segment_{seg_idx:02d}.wav")
             track_path = os.path.join(args.pycropPath, '%05d' % ii)
-            extract_segment(track_path, seg_start+10, seg_end-10, segment_video_path)
+            extract_segment(track_path, seg_start+10, seg_end-10, segment_video_path, f"{ii:05d}.avi")
             filtered_segments.append(segment_video_path)
 
     print("Found ", count_segments, " Segments")
@@ -875,8 +891,8 @@ def main():
     #     visualization(vidTracks, scores, args)
 
     # At the end of the main function
-    folders_to_keep = [args.pyfilteredVideo]
-    folders_to_delete = [args.pyaviPath ,args.pyframesPath, args.pyworkPath, args.pycropPath]
+    folders_to_keep = []
+    folders_to_delete = [args.pyfilteredVideo, args.pyaviPath ,args.pyframesPath, args.pyworkPath, args.pycropPath]
     # folders_to_keep = [args.pyfilteredVideo, args.pyaviPath ,args.pyframesPath, args.pyworkPath, args.pycropPath]
     # folders_to_delete = []
 
