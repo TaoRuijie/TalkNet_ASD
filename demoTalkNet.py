@@ -18,6 +18,10 @@ import python_speech_features
 import mediapipe as mp
 import matplotlib.pyplot as plt
 
+import json
+import insightface
+from insightface.app import FaceAnalysis
+
 import cProfile
 import pstats
 from scipy import signal
@@ -43,6 +47,8 @@ mp_face_mesh = mp.solutions.face_mesh
 face_mesh = mp_face_mesh.FaceMesh(
     min_detection_confidence=0.5, min_tracking_confidence=0.5)
 
+face_app = FaceAnalysis(name='buffalo_s')  # This model supports age & gender
+face_app.prepare(ctx_id=0)
 
 parser = argparse.ArgumentParser(
     description="TalkNet Demo or Columnbia ASD Evaluation")
@@ -871,6 +877,35 @@ def main():
             #     args.pyfilteredAudio, f"{args.videoName}_track_{ii:05d}_segment_{seg_idx:02d}.wav")
             track_path = os.path.join(args.pycropPath, '%05d' % ii)
             extract_segment(track_path, seg_start+10, seg_end-10, segment_video_path, f"{ii:05d}.avi")
+
+            # Extract middle frame for age and gender prediction
+            middle_frame = (seg_start + seg_end) // 2
+            frame_path = os.path.join(args.pyframesPath, f"{(middle_frame + 1):06d}.jpg")
+            image = cv2.imread(frame_path)
+
+            if image is not None:
+                faces = face_app.get(image)
+                if faces:
+                    face = faces[0]  # Assume single face
+                    age = face.age
+                    gender = 'male' if face.gender == 1 else 'female'
+
+                    # Save age and gender in JSON
+                    metadata = {"age": age, "gender": gender}
+                    json_path = os.path.join(args.pyfilteredVideo, f"{ii:05d}.json")
+                    with open(json_path, 'w') as json_file:
+                        json.dump(metadata, json_file)
+
+                    s3_object_key = f"{args.channelName}/{args.video_id}/{ii:05d}.json"
+                    upload_file_to_s3(json_path, args.bucketName, s3_object_key)
+
+                    # Check if the file exists
+                    if os.path.exists(json_path):
+                        os.remove(json_path)
+                        print(f"File '{json_path}' has been deleted successfully.")
+                    else:
+                        print(f"File '{json_path}' does not exist.") 
+
             filtered_segments.append(segment_video_path)
 
     print("Found ", count_segments, " Segments")
