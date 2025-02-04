@@ -43,7 +43,7 @@ if __name__ == "__main__":
     # Parse arguments for the batch process
     parser = argparse.ArgumentParser(description="Batch Process Videos with demoTalkNet")
     parser.add_argument('--videoFolderInput', type=str, required=True, help='Path to the folder containing input videos.')
-    parser.add_argument('--videoFolderOutput', type=str, help='Path to the folder for storing outputs and temporary files.')
+    parser.add_argument('--videoFolderOutput', default="output_dir", type=str, help='Path to the folder for storing outputs and temporary files.')
     parser.add_argument('--bucketName', type=str, help='Path to the folder for storing outputs and temporary files.')
     parser.add_argument('--channelName', type=str, required=True, help='Path to the folder for storing outputs and temporary files.')
     parser.add_argument('--pretrainModel', type=str,default="pretrain_TalkSet.model", help='Path to the pretrained TalkNet model.')
