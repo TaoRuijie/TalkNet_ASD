@@ -11,3 +11,4 @@ torchvision
 ffmpeg
 gdown
 youtube-dl
+mediapipe==0.10.9
